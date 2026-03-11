@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sıvılaşma Analizi</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 24px 0;
+            border-bottom: 2px solid #1e40af;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: #60a5fa;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            color: #60a5fa;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card h2 .icon {
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tabaka-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .tabaka-header h3 {
+            font-size: 15px;
+            color: #fbbf24;
+        }
+
+        .btn-remove {
+            background: #991b1b;
+            color: #fca5a5;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .tabaka-card {
+            background: #162032;
+            border: 1px solid #2d4a6f;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        /* Sonuc */
+        #sonuclar {
+            display: none;
+        }
+
+        .sonuc-tablo {
+            width: 100%;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .sonuc-tablo table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            min-width: 500px;
+        }
+
+        .sonuc-tablo th, .sonuc-tablo td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sonuc-tablo th {
+            background: #1e3a5f;
+            color: #93c5fd;
+            font-size: 11px;
+            position: sticky;
+            top: 0;
+        }
+
+        .risk-yuksek {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        .risk-sinir {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        .risk-guvenli {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .risk-ozel {
+            color: #a78bfa;
+        }
+
+        .yorum-card {
+            background: #162032;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border-left: 4px solid #475569;
+        }
+
+        .yorum-card.tehlike {
+            border-left-color: #ef4444;
+            background: #1c1117;
+        }
+
+        .yorum-card.dikkat {
+            border-left-color: #f59e0b;
+            background: #1c1a11;
+        }
+
+        .yorum-card.guvenli {
+            border-left-color: #22c55e;
+            background: #111c17;
+        }
+
+        .yorum-card h4 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .yorum-card p, .yorum-card li {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .yorum-card ul {
+            padding-left: 18px;
+            margin-top: 6px;
+        }
+
+        .genel-box {
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 16px;
+        }
+
+        .genel-box.tehlike {
+            background: linear-gradient(135deg, #450a0a, #7f1d1d);
+            border: 1px solid #dc2626;
+        }
+
+        .genel-box.dikkat {
+            background: linear-gradient(135deg, #451a03, #78350f);
+            border: 1px solid #d97706;
+        }
+
+        .genel-box.guvenli {
+            background: linear-gradient(135deg, #052e16, #166534);
+            border: 1px solid #16a34a;
+        }
+
+        .genel-box h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .genel-box li {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #e2e8f0;
+        }
+
+        .genel-box ul {
+            padding-left: 18px;
+        }
+
+        .parametre-ozet {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .parametre-ozet .item {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .parametre-ozet .item .val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .parametre-ozet .item .lbl {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .btn-geri {
+            background: #475569;
+            color: white;
+            margin-top: 16px;
+        }
+
+        .not-kutusu {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<!-- GİRİŞ FORMU -->
+<div id="girisFormu">
+    <div class="header">
+        <h1>Sıvılaşma Analizi</h1>
+        <p>Seed & Idriss Basitleştirilmiş Yöntemi (SPT Tabanlı)</p>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#127754;</span> Deprem Verileri</h2>
+        <div class="row">
+            <div class="form-group">
+                <label>Deprem Büyüklüğü (Mw)</label>
+                <input type="number" id="mw" step="0.1" value="7.5" inputmode="decimal">
+            </div>
+            <div class="form-group">
+                <label>Maks. Yer İvmesi (g)</label>
+                <input type="number" id="amax" step="0.01" value="0.40" inputmode="decimal">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#128167;</span> Yeraltı Suyu</h2>
+        <div class="form-group">
+            <label>Su Seviyesi Derinliği (m)</label>
+            <input type="number" id="yw" step="0.1" value="2.0" inputmode="decimal">
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#129704;</span> Zemin Tabakaları</h2>
+        <div id="tabakalar">
+            <!-- Tabakalar buraya eklenir -->
+        </div>
+        <button class="btn btn-secondary" onclick="tabakaEkle()">+ Tabaka Ekle</button>
+    </div>
+
+    <button class="btn btn-primary" onclick="analizBaslat()">Analizi Başlat</button>
+</div>
+
+<!-- SONUÇLAR -->
+<div id="sonuclar">
+    <div class="header">
+        <h1>Analiz Sonuçları</h1>
+        <p>Sıvılaşma Potansiyeli Değerlendirmesi</p>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#128202;</span> Giriş Parametreleri</h2>
+        <div class="parametre-ozet" id="parametreOzet"></div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#128203;</span> Hesap Tablosu</h2>
+        <div class="sonuc-tablo" id="sonucTablo"></div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">&#128269;</span> Tabaka Yorumları</h2>
+        <div id="tabakaYorumlari"></div>
+    </div>
+
+    <div id="genelDegerlendirme"></div>
+
+    <div class="not-kutusu">
+        <strong>Not:</strong> Bu analiz Seed & Idriss basitleştirilmiş yöntemi ile yapılmıştır.
+        Kesin mühendislik kararları için kapsamlı zemin etüdü ve ileri düzey analizler gereklidir.
+    </div>
+
+    <button class="btn btn-geri" onclick="geriDon()">&#8592; Yeni Analiz</button>
+</div>
+
+<script>
+let tabakaNo = 0;
+
+function tabakaEkle(derinlik, gamma, nspt, fc) {
+    tabakaNo++;
+    const div = document.createElement('div');
+    div.className = 'tabaka-card';
+    div.id = 'tabaka_' + tabakaNo;
+    div.innerHTML = `
+        <div class="tabaka-header">
+            <h3>Tabaka ${tabakaNo}</h3>
+            <button class="btn-remove" onclick="tabakaSil('tabaka_${tabakaNo}')">Sil</button>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>Derinlik (m)</label>
+                <input type="number" class="t-derinlik" step="0.5" value="${derinlik || ''}" placeholder="örn: 3" inputmode="decimal">
+            </div>
+            <div class="form-group">
+                <label>Birim H.A. (kN/m³)</label>
+                <input type="number" class="t-gamma" step="0.1" value="${gamma || ''}" placeholder="örn: 18" inputmode="decimal">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label>SPT-N Darbe Sayısı</label>
+                <input type="number" class="t-nspt" step="1" value="${nspt || ''}" placeholder="örn: 10" inputmode="numeric">
+            </div>
+            <div class="form-group">
+                <label>İnce Dane Oranı (%)</label>
+                <input type="number" class="t-fc" step="1" value="${fc || ''}" placeholder="örn: 15" inputmode="numeric">
+            </div>
+        </div>
+    `;
+    document.getElementById('tabakalar').appendChild(div);
+}
+
+function tabakaSil(id) {
+    document.getElementById(id).remove();
+    yenidenNumarala();
+}
+
+function yenidenNumarala() {
+    const cards = document.querySelectorAll('.tabaka-card');
+    cards.forEach((card, i) => {
+        card.querySelector('h3').textContent = 'Tabaka ' + (i + 1);
+    });
+}
+
+// Varsayılan tabakalar
+tabakaEkle(3, 18, 8, 15);
+tabakaEkle(6, 18.5, 12, 10);
+tabakaEkle(9, 19, 18, 5);
+
+// Hesaplama fonksiyonları
+function duzeltilmisSPT(N_spt, sigma_eff) {
+    let CN = sigma_eff <= 0 ? 1.0 : Math.min(1.7, Math.sqrt(100.0 / sigma_eff));
+    return Math.round(N_spt * CN * 10) / 10;
+}
+
+function inceDaneDuzeltmesi(N1_60, FC) {
+    let alpha, beta;
+    if (FC <= 5) {
+        alpha = 0; beta = 1.0;
+    } else if (FC < 35) {
+        alpha = Math.exp(1.76 - 190.0 / (FC * FC));
+        beta = 0.99 + Math.pow(FC, 1.5) / 1000.0;
+    } else {
+        alpha = 5.0; beta = 1.2;
+    }
+    return Math.round((alpha + beta * N1_60) * 10) / 10;
+}
+
+function hesaplaCRR(N1_60cs) {
+    if (N1_60cs >= 30) return null;
+    let crr = 1.0 / (34.0 - N1_60cs)
+            + N1_60cs / 135.0
+            + 50.0 / Math.pow(10.0 * N1_60cs + 45.0, 2)
+            - 1.0 / 200.0;
+    return Math.round(crr * 10000) / 10000;
+}
+
+function hesaplaMSF(Mw) {
+    return Math.round(Math.pow(10, 2.24) / Math.pow(Mw, 2.56) * 1000) / 1000;
+}
+
+function hesaplaRd(z) {
+    let rd;
+    if (z <= 9.15) rd = 1.0 - 0.00765 * z;
+    else if (z <= 23.0) rd = 1.174 - 0.0267 * z;
+    else rd = Math.max(0.744 - 0.008 * z, 0.1);
+    return Math.round(rd * 10000) / 10000;
+}
+
+function analizBaslat() {
+    const Mw = parseFloat(document.getElementById('mw').value);
+    const amax = parseFloat(document.getElementById('amax').value);
+    const yw = parseFloat(document.getElementById('yw').value);
+
+    if (isNaN(Mw) || isNaN(amax) || isNaN(yw)) {
+        alert('Lütfen deprem verilerini ve su seviyesini doldurunuz.');
+        return;
+    }
+
+    const cards = document.querySelectorAll('.tabaka-card');
+    if (cards.length === 0) {
+        alert('En az bir zemin tabakası ekleyiniz.');
+        return;
+    }
+
+    const tabakalar = [];
+    let hata = false;
+
+    cards.forEach((card, i) => {
+        const z = parseFloat(card.querySelector('.t-derinlik').value);
+        const gamma = parseFloat(card.querySelector('.t-gamma').value);
+        const nspt = parseInt(card.querySelector('.t-nspt').value);
+        const fc = parseFloat(card.querySelector('.t-fc').value);
+
+        if (isNaN(z) || isNaN(gamma) || isNaN(nspt) || isNaN(fc)) {
+            alert(`Tabaka ${i + 1} verilerini eksiksiz doldurunuz.`);
+            hata = true;
+            return;
+        }
+
+        tabakalar.push({ derinlik: z, gamma: gamma, N_spt: nspt, ince_dane: fc });
+    });
+
+    if (hata) return;
+
+    // Gerilme hesabı
+    const gamma_su = 9.81;
+    tabakalar.forEach(t => {
+        t.sigma_v = Math.round(t.gamma * t.derinlik * 100) / 100;
+        const u = t.derinlik > yw ? gamma_su * (t.derinlik - yw) : 0;
+        t.sigma_v_eff = Math.round((t.sigma_v - u) * 100) / 100;
+        t.u = Math.round(u * 100) / 100;
+    });
+
+    const MSF = hesaplaMSF(Mw);
+
+    // Analiz
+    tabakalar.forEach(t => {
+        if (t.derinlik <= yw) {
+            t.durum = 'su_ustu';
+            return;
+        }
+
+        t.N1_60 = duzeltilmisSPT(t.N_spt, t.sigma_v_eff);
+        t.N1_60cs = inceDaneDuzeltmesi(t.N1_60, t.ince_dane);
+
+        const rd = hesaplaRd(t.derinlik);
+        t.rd = rd;
+        t.CSR = t.sigma_v_eff > 0
+            ? Math.round(0.65 * (t.sigma_v / t.sigma_v_eff) * amax * rd * 10000) / 10000
+            : 0;
+
+        const CRR_75 = hesaplaCRR(t.N1_60cs);
+        if (CRR_75 === null) {
+            t.durum = 'sivila_smaz';
+            return;
+        }
+
+        t.CRR = Math.round(CRR_75 * MSF * 10000) / 10000;
+        t.FS = t.CSR > 0 ? Math.round(t.CRR / t.CSR * 100) / 100 : 999;
+
+        if (t.FS < 1.0) t.durum = 'tehlike';
+        else if (t.FS < 1.25) t.durum = 'sinir';
+        else t.durum = 'guvenli';
+    });
+
+    sonuclariGoster(Mw, amax, yw, MSF, tabakalar);
+}
+
+function sonuclariGoster(Mw, amax, yw, MSF, tabakalar) {
+    document.getElementById('girisFormu').style.display = 'none';
+    document.getElementById('sonuclar').style.display = 'block';
+    window.scrollTo(0, 0);
+
+    // Parametre ozet
+    document.getElementById('parametreOzet').innerHTML = `
+        <div class="item"><div class="val">${Mw}</div><div class="lbl">Mw</div></div>
+        <div class="item"><div class="val">${amax}g</div><div class="lbl">amax</div></div>
+        <div class="item"><div class="val">${yw} m</div><div class="lbl">Su Seviyesi</div></div>
+        <div class="item"><div class="val">${MSF}</div><div class="lbl">MSF</div></div>
+    `;
+
+    // Tablo
+    let thtml = `<table>
+        <tr><th>#</th><th>z(m)</th><th>N-SPT</th><th>(N1)60</th><th>(N1)60cs</th><th>CSR</th><th>CRR</th><th>FS</th></tr>`;
+
+    tabakalar.forEach((t, i) => {
+        let cls = '';
+        let fsStr = '-';
+        if (t.durum === 'tehlike') { cls = 'risk-yuksek'; fsStr = t.FS.toFixed(2); }
+        else if (t.durum === 'sinir') { cls = 'risk-sinir'; fsStr = t.FS.toFixed(2); }
+        else if (t.durum === 'guvenli') { cls = 'risk-guvenli'; fsStr = t.FS.toFixed(2); }
+        else { cls = 'risk-ozel'; }
+
+        thtml += `<tr class="${cls}">
+            <td>${i + 1}</td>
+            <td>${t.derinlik}</td>
+            <td>${t.N_spt}</td>
+            <td>${t.N1_60 !== undefined ? t.N1_60 : '-'}</td>
+            <td>${t.N1_60cs !== undefined ? t.N1_60cs : '-'}</td>
+            <td>${t.CSR !== undefined ? t.CSR.toFixed(4) : '-'}</td>
+            <td>${t.CRR !== undefined ? t.CRR.toFixed(4) : '-'}</td>
+            <td><strong>${fsStr}</strong></td>
+        </tr>`;
+    });
+
+    thtml += '</table>';
+    document.getElementById('sonucTablo').innerHTML = thtml;
+
+    // Tabaka yorumları
+    let yhtml = '';
+    tabakalar.forEach((t, i) => {
+        let cardClass = '', baslik = '', aciklama = '';
+
+        if (t.durum === 'su_ustu') {
+            cardClass = '';
+            baslik = `Tabaka ${i + 1} (z = ${t.derinlik} m)`;
+            aciklama = 'Su seviyesi üstünde - Sıvılaşma riski yok.';
+        } else if (t.durum === 'sivila_smaz') {
+            cardClass = 'guvenli';
+            baslik = `Tabaka ${i + 1} (z = ${t.derinlik} m)`;
+            aciklama = `(N1)60cs ≥ 30 - Sıvılaşmayan zemin.`;
+        } else if (t.durum === 'tehlike') {
+            cardClass = 'tehlike';
+            baslik = `Tabaka ${i + 1} (z = ${t.derinlik} m) - FS = ${t.FS.toFixed(2)}`;
+            if (t.FS < 0.5) {
+                aciklama = `<strong>Ciddi sıvılaşma riski!</strong> FS çok düşük. Zemin iyileştirmesi kesinlikle gereklidir.`;
+            } else if (t.FS < 0.75) {
+                aciklama = `Orta-yüksek sıvılaşma riski. Zemin iyileştirmesi önerilir.`;
+            } else {
+                aciklama = `Sıvılaşma olası. Detaylı analiz ve zemin iyileştirmesi değerlendirilmelidir.`;
+            }
+        } else if (t.durum === 'sinir') {
+            cardClass = 'dikkat';
+            baslik = `Tabaka ${i + 1} (z = ${t.derinlik} m) - FS = ${t.FS.toFixed(2)}`;
+            aciklama = 'Sınır durumda. İleri analiz (CPT tabanlı) önerilir.';
+        } else {
+            cardClass = 'guvenli';
+            baslik = `Tabaka ${i + 1} (z = ${t.derinlik} m) - FS = ${t.FS.toFixed(2)}`;
+            aciklama = 'Sıvılaşma beklenmez. Güvenli.';
+        }
+
+        yhtml += `<div class="yorum-card ${cardClass}">
+            <h4>${baslik}</h4>
+            <p>${aciklama}</p>
+        </div>`;
+    });
+
+    document.getElementById('tabakaYorumlari').innerHTML = yhtml;
+
+    // Genel değerlendirme
+    const tehlikeVar = tabakalar.some(t => t.durum === 'tehlike');
+    const sinirVar = tabakalar.some(t => t.durum === 'sinir');
+
+    let ghtml = '';
+    if (tehlikeVar) {
+        ghtml = `<div class="genel-box tehlike">
+            <h3>&#9888; SIVILAŞMA RİSKİ TESPİT EDİLDİ</h3>
+            <ul>
+                <li>Detaylı zemin etüdü ve laboratuvar deneyleri yapılmalıdır</li>
+                <li>CPT tabanlı analiz ile sonuçlar doğrulanmalıdır</li>
+                <li>Zemin iyileştirme yöntemleri değerlendirilmelidir (vibro-kompaksiyon, jet grout, taş kolon, derin karıştırma)</li>
+                <li>Yapı temel sistemi sıvılaşma etkilerine göre tasarlanmalıdır</li>
+                <li>Sıvılaşma sonrası oturma ve yanal yayılma analizleri yapılmalıdır</li>
+            </ul>
+        </div>`;
+    } else if (sinirVar) {
+        ghtml = `<div class="genel-box dikkat">
+            <h3>&#9888; SINIR DURUM TESPİT EDİLDİ</h3>
+            <ul>
+                <li>CPT tabanlı analiz ile doğrulama yapılmalıdır</li>
+                <li>Olasılıksal sıvılaşma analizi düşünülmelidir</li>
+                <li>Tasarımda muhafazakâr yaklaşım benimsenmelidir</li>
+            </ul>
+        </div>`;
+    } else {
+        ghtml = `<div class="genel-box guvenli">
+            <h3>&#10003; GÜVENLİ</h3>
+            <p>Zemin profili sıvılaşma açısından güvenli görünmektedir. Farklı deprem senaryoları için analizin tekrarlanması önerilir.</p>
+        </div>`;
+    }
+
+    document.getElementById('genelDegerlendirme').innerHTML = ghtml;
+}
+
+function geriDon() {
+    document.getElementById('sonuclar').style.display = 'none';
+    document.getElementById('girisFormu').style.display = 'block';
+    window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>
